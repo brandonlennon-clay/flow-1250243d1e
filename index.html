@@ -5059,8 +5059,8 @@ RoobertSemiMono-latin.woff2    77972 bytes  sha256 fad69651ca7b1be49dcec4f591f2a
         <path data-edge-from="anchor" data-edge-to="gate" data-edge-key="9" data-edge-id="to-gate" data-composition-points="419.6,367;447.6,367" d="M 419.6 367 L 441.6 367" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
 
         <!-- Nodes -->
-        <g id="node-sfdc" data-node-id="sfdc" data-node-label="Salesforce" tabindex="0" role="button" aria-label="Focus Salesforce, Full CRM (sandbox), Salesforce" aria-pressed="false" data-node-kind="external" data-node-sublabel="Full CRM (sandbox)" data-node-context="Salesforce">
-          <title>Salesforce · Full CRM (sandbox) · Salesforce</title>
+        <g id="node-sfdc" data-node-id="sfdc" data-node-label="Salesforce" tabindex="0" role="button" aria-label="Focus Salesforce, Full CRM (production), Salesforce" aria-pressed="false" data-node-kind="external" data-node-sublabel="Full CRM (production)" data-node-context="Salesforce">
+          <title>Salesforce · Full CRM (production) · Salesforce</title>
           <rect x="61.60000000000002" y="93" width="150" height="52" rx="12" class="c-mask"/>
           <rect x="61.60000000000002" y="93" width="150" height="52" rx="12" class="c-external"/>
           <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(67.60000000000002 99) scale(0.6875)">
@@ -5068,10 +5068,10 @@ RoobertSemiMono-latin.woff2    77972 bytes  sha256 fad69651ca7b1be49dcec4f591f2a
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="136.60000000000002" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Salesforce</text>
-          <text data-detail="context" x="136.60000000000002" y="131" class="t-muted" font-size="8" text-anchor="middle">Full CRM (sandbox)</text>
+          <text data-detail="context" x="136.60000000000002" y="131" class="t-muted" font-size="8" text-anchor="middle">Full CRM (production)</text>
         </g>
 
-        <g id="node-writeback" data-node-id="writeback" data-node-note="Audiences export sync writes the results to the new Clay fields on each account. We run a sandbox batch before production. Navan&#39;s GBV model reads these fields from Salesforce." data-node-label="Salesforce write-back" tabindex="0" role="button" aria-label="Focus Salesforce write-back, New Clay fields, Salesforce" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="New Clay fields" data-node-context="Salesforce">
+        <g id="node-writeback" data-node-id="writeback" data-node-note="After review, Clay writes the results to the new Clay fields in Salesforce production, starting with a pilot group. Navan&#39;s GBV model reads these fields from Salesforce." data-node-label="Salesforce write-back" tabindex="0" role="button" aria-label="Focus Salesforce write-back, New Clay fields, Salesforce" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="New Clay fields" data-node-context="Salesforce">
           <title>Salesforce write-back · New Clay fields · Salesforce</title>
           <rect x="1049.6" y="93" width="160" height="52" rx="12" class="c-mask"/>
           <rect x="1049.6" y="93" width="160" height="52" rx="12" class="c-messagebus"/>
@@ -5097,8 +5097,8 @@ RoobertSemiMono-latin.woff2    77972 bytes  sha256 fad69651ca7b1be49dcec4f591f2a
           <text data-detail="context" x="136.60000000000002" y="255" class="t-muted" font-size="8" text-anchor="middle">Synced from Salesforce</text>
         </g>
 
-        <g id="node-segment" data-node-id="segment" data-node-note="We start with a sample of accounts per segment to measure credits per account. The full run covers about 650K accounts." data-node-label="Account segment" tabindex="0" role="button" aria-label="Focus Account segment, ~650K, Global Enterprise first, Clay Audiences" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="~650K, Global Enterprise first" data-node-context="Clay Audiences">
-          <title>Account segment · ~650K, Global Enterprise first · Clay Audiences</title>
+        <g id="node-segment" data-node-id="segment" data-node-note="We cut the slice to enrich with Account Prospect Segment, a field on every account. A sample comes first to measure credits per account, then the full segment runs." data-node-label="Account segment" tabindex="0" role="button" aria-label="Focus Account segment, ~650K accounts in scope, Clay Audiences" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="~650K accounts in scope" data-node-context="Clay Audiences">
+          <title>Account segment · ~650K accounts in scope · Clay Audiences</title>
           <rect x="239.60000000000002" y="217" width="170" height="52" rx="12" class="c-mask"/>
           <rect x="239.60000000000002" y="217" width="170" height="52" rx="12" class="c-frontend"/>
           <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(245.60000000000002 223) scale(0.6875)">
@@ -5108,10 +5108,10 @@ RoobertSemiMono-latin.woff2    77972 bytes  sha256 fad69651ca7b1be49dcec4f591f2a
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="324.6" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Account segment</text>
-          <text data-detail="context" x="324.6" y="255" class="t-muted" font-size="8" text-anchor="middle">~650K, Global Enterprise first</text>
+          <text data-detail="context" x="324.6" y="255" class="t-muted" font-size="8" text-anchor="middle">~650K accounts in scope</text>
         </g>
 
-        <g id="node-enriched" data-node-id="enriched" data-node-note="Clay saves each account&#39;s results back to its Audience record. The Audience then holds the enriched data for every account." data-node-label="Enriched accounts" tabindex="0" role="button" aria-label="Focus Enriched accounts, Saved back to Audiences, Clay Audiences" aria-pressed="false" data-node-kind="database" data-node-sublabel="Saved back to Audiences" data-node-context="Clay Audiences">
+        <g id="node-enriched" data-node-id="enriched" data-node-note="Clay saves each account&#39;s results back to its Audience record. Navan reviews the results here before anything is written to Salesforce." data-node-label="Enriched accounts" tabindex="0" role="button" aria-label="Focus Enriched accounts, Saved back to Audiences, Clay Audiences" aria-pressed="false" data-node-kind="database" data-node-sublabel="Saved back to Audiences" data-node-context="Clay Audiences">
           <title>Enriched accounts · Saved back to Audiences · Clay Audiences</title>
           <rect x="1049.6" y="217" width="160" height="52" rx="12" class="c-mask"/>
           <rect x="1049.6" y="217" width="160" height="52" rx="12" class="c-database"/>
@@ -5146,15 +5146,15 @@ RoobertSemiMono-latin.woff2    77972 bytes  sha256 fad69651ca7b1be49dcec4f591f2a
           <text data-detail="context" x="517.6" y="379" class="t-muted" font-size="8" text-anchor="middle">300 employees</text>
         </g>
 
-        <g id="node-core" data-node-id="core" data-node-note="Clay keeps every source&#39;s value and picks a winner in this order: Claygent, then CPJ, then ZoomInfo." data-node-label="Firmographics and GBV" tabindex="0" role="button" aria-label="Focus Firmographics and GBV, Claygent, CPJ, then ZoomInfo, Clay table" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Claygent, CPJ, then ZoomInfo" data-node-context="Clay table">
-          <title>Firmographics and GBV · Claygent, CPJ, then ZoomInfo · Clay table</title>
+        <g id="node-core" data-node-id="core" data-node-note="Clay data comes first, with ZoomInfo and Lusha as backup. Clay keeps every source&#39;s answer and records which one it used. Parent and ultimate parent run for every account." data-node-label="Firmographics and GBV" tabindex="0" role="button" aria-label="Focus Firmographics and GBV, Clay first, then ZoomInfo, Lusha, Clay table" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Clay first, then ZoomInfo, Lusha" data-node-context="Clay table">
+          <title>Firmographics and GBV · Clay first, then ZoomInfo, Lusha · Clay table</title>
           <rect x="615.6" y="341" width="180" height="52" rx="12" class="c-mask"/>
           <rect x="615.6" y="341" width="180" height="52" rx="12" class="c-backend"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(621.6 347) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="705.6" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Firmographics and GBV</text>
-          <text data-detail="context" x="705.6" y="379" class="t-muted" font-size="8" text-anchor="middle">Claygent, CPJ, then ZoomInfo</text>
+          <text data-detail="context" x="705.6" y="379" class="t-muted" font-size="8" text-anchor="middle">Clay first, then ZoomInfo, Lusha</text>
         </g>
 
         <g id="node-flags" data-node-id="flags" data-node-note="On hold at Navan&#39;s request. Each agent answers yes, no, or unknown, and shows its evidence and a date." data-node-label="Claygents" tabindex="0" role="button" aria-label="Focus Claygents, 7 research agents, on hold, Clay table" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="7 research agents, on hold" data-node-context="Clay table">
@@ -5168,14 +5168,14 @@ RoobertSemiMono-latin.woff2    77972 bytes  sha256 fad69651ca7b1be49dcec4f591f2a
           <text data-detail="context" x="903.6" y="379" class="t-muted" font-size="8" text-anchor="middle">7 research agents, on hold</text>
         </g>
 
-        <g id="node-enterprise" data-node-id="enterprise" data-node-note="Runs only for Enterprise accounts, over 300 employees. SMB accounts skip this step and go straight to write-back." data-node-label="Parent and regional data" tabindex="0" role="button" aria-label="Focus Parent and regional data, Accounts over 300 employees, Clay table" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Accounts over 300 employees" data-node-context="Clay table">
-          <title>Parent and regional data · Accounts over 300 employees · Clay table</title>
+        <g id="node-enterprise" data-node-id="enterprise" data-node-note="Runs only for Enterprise accounts, over 300 employees. SMB accounts skip this step and go straight to Enriched accounts." data-node-label="Regional headcount" tabindex="0" role="button" aria-label="Focus Regional headcount, Accounts over 300 employees, Clay table" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Accounts over 300 employees" data-node-context="Clay table">
+          <title>Regional headcount · Accounts over 300 employees · Clay table</title>
           <rect x="1049.6" y="341" width="160" height="52" rx="12" class="c-mask"/>
           <rect x="1049.6" y="341" width="160" height="52" rx="12" class="c-backend"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1055.6 347) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="1129.6" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Parent and regional data</text>
+          <text data-node-label="" data-detail-anchor="" x="1129.6" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Regional headcount</text>
           <text data-detail="context" x="1129.6" y="379" class="t-muted" font-size="8" text-anchor="middle">Accounts over 300 employees</text>
         </g>
 
@@ -5334,7 +5334,7 @@ RoobertSemiMono-latin.woff2    77972 bytes  sha256 fad69651ca7b1be49dcec4f591f2a
             <span class="semantic-passport-detail" id="focus-detail" hidden></span>
             <p class="semantic-passport-note" id="focus-note" hidden></p>
             <div class="semantic-passport-fields" id="focus-fields" hidden tabindex="0" aria-label="Field list"></div>
-            <script type="application/json" id="node-fields-data">{"core": [["Firmographics, every account", ["Company name", "Website", "Employee count: the winning value plus LinkedIn, ZoomInfo, and direct-source values", "Industry: 12-bucket taxonomy", "Annual revenue in USD", "HQ city, state, and country", "HQ street address", "HQ postal code", "Founded year", "Office count: physical offices"]], ["GBV inputs, every account", ["Employee growth over 12 months", "Number of countries", "Sales team size", "Ops, Eng, and Finance team size", "Senior leaders count", "Open job postings: count", "Latest funding: amount, date, and round", "Total funding"]], ["Above the SMB line", ["Parent account", "Ultimate parent", "Regional headcount: NA, DACH, Nordics, EMEA", "Regional headcount: UKI, France, Benelux, APAC, India, Canada"]], ["On hold", ["7 Claygents: Anti-ICP, AI Native, Acquisition, Merger, Rebrand, Out of business, Graduation"]]], "enterprise": [["Above the SMB line", ["Parent account", "Ultimate parent", "Regional headcount: NA, DACH, Nordics, EMEA", "Regional headcount: UKI, France, Benelux, APAC, India, Canada"]]], "flags": [["Claygents", ["Acquisition: was this company bought by another company?", "Merger: did this company combine with another company as equals?", "Out of business: has this company shut down? Proof is a filing, an announcement, or a dead website confirmed by a second source.", "Account graduation: did headcount cross 300 in the last 6 months? This check compares current headcount with a past headcount.", "Company rebrand: did the company change its name, domain, or brand?", "Anti-ICP: should Navan never sell to this account, based on past sales disqualification reasons?", "AI Native (Commercial): is AI core to the company's product or operations? Applies to the Commercial segment."]]]}</script>
+            <script type="application/json" id="node-fields-data">{"core": [["Firmographics, every account", ["Company name", "Website", "Employee count: the winning value plus LinkedIn, ZoomInfo, and direct-source values", "Industry: 12-bucket taxonomy", "Annual revenue in USD", "HQ city, state, and country", "HQ street address", "HQ postal code", "Founded year", "Office count: physical offices"]], ["GBV inputs, every account", ["Employee growth over 12 months", "Number of countries", "Sales team size", "Ops, Eng, and Finance team size", "Senior leaders count", "Open job postings: count", "Latest funding: amount, date, and round", "Total funding"]], ["Parent and ultimate parent, every account", ["Parent account", "Ultimate parent"]], ["Regional headcount, Enterprise only", ["Regional headcount: NA, DACH, Nordics, EMEA", "Regional headcount: UKI, France, Benelux, APAC, India, Canada"]], ["On hold", ["7 Claygents: Anti-ICP, AI Native, Acquisition, Merger, Rebrand, Out of business, Graduation"]]], "enterprise": [["Regional headcount, Enterprise only", ["Regional headcount: NA, DACH, Nordics, EMEA", "Regional headcount: UKI, France, Benelux, APAC, India, Canada"]]], "flags": [["Claygents", ["Acquisition: was this company bought by another company?", "Merger: did this company combine with another company as equals?", "Out of business: has this company shut down? Proof is a filing, an announcement, or a dead website confirmed by a second source.", "Account graduation: did headcount cross 300 in the last 6 months? This check compares current headcount with a past headcount.", "Company rebrand: did the company change its name, domain, or brand?", "Anti-ICP: should Navan never sell to this account, based on past sales disqualification reasons?", "AI Native (Commercial): is AI core to the company's product or operations? Applies to the Commercial segment."]]]}</script>
             <div class="semantic-passport-meta" id="focus-passport-meta" aria-label="Node metadata">
               <span id="focus-kind" data-passport="kind"></span>
               <span id="focus-context" data-passport="context" hidden></span>
@@ -5459,7 +5459,7 @@ RoobertSemiMono-latin.woff2    77972 bytes  sha256 fad69651ca7b1be49dcec4f591f2a
           <h3>How we&#39;ll test</h3>
         </div>
         <ul>
-          <li>&bull; We build the full flow, then run a sample of accounts per segment</li>
+          <li>&bull; We build the full flow, then run a sample of the segment</li>
           <li>&bull; Credits from that run set the estimate for SMB and Enterprise</li>
           <li>&bull; The full run starts after Navan signs off on the sample</li>
         </ul>
