@@ -1,0 +1,182 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex, nofollow, noarchive"></head><body>
+<title>Navan Core Data Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column. A progress line, then two lists (firmographics, GBV inputs), one row per data point with a checkbox, a status chip and a collapsible approach. */
+:root{
+  --bg:#f6f7f8; --surface:#ffffff; --ink:#17201f; --muted:#5e6a69; --line:#dfe4e3;
+  --accent:#0f6e6a; --accent-soft:#dcefed;
+  --ok:#1f7a4d; --ok-soft:#dff2e7; --wait:#946200; --wait-soft:#f7ecd2; --hold:#6b6f78; --hold-soft:#eceef1;
+  --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111615; --surface:#182120; --ink:#e6eceb; --muted:#9aa7a6; --line:#2a3634;
+  --accent:#5cc4bc; --accent-soft:#183b38; --ok:#6fd39d; --ok-soft:#173526; --wait:#e9b858; --wait-soft:#3a2d12; --hold:#a8adb7; --hold-soft:#262b33; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111615; --surface:#182120; --ink:#e6eceb; --muted:#9aa7a6; --line:#2a3634;
+  --accent:#5cc4bc; --accent-soft:#183b38; --ok:#6fd39d; --ok-soft:#173526; --wait:#e9b858; --wait-soft:#3a2d12; --hold:#a8adb7; --hold-soft:#262b33; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);padding-inline:16px;padding-block:28px 48px}
+main{max-width:760px;margin:0 auto;display:grid;gap:28px}
+h1{font-size:26px;line-height:1.15;font-weight:600;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+p{margin:0}
+header{display:grid;gap:10px}
+.lede{color:var(--muted);max-width:62ch}
+.progress{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.meter{flex:1 1 220px;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter span{display:block;height:100%;width:0;background:var(--accent);transition:width .25s ease}
+.count{font:500 13px/1 var(--mono);font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:var(--muted)}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:12px 16px;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent);cursor:pointer}
+.item input:disabled{cursor:default}
+.item input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.name{font-weight:600;cursor:pointer}
+.name .num{font:500 12px/1 var(--mono);color:var(--muted);margin-right:6px;font-variant-numeric:tabular-nums}
+.item.done .name{color:var(--muted)}
+.fields{grid-column:2/4;font:12px/1.5 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.chip{font:500 11px/1 var(--sans);padding:5px 8px;border-radius:99px;white-space:nowrap;align-self:start}
+.chip.wired{background:var(--ok-soft);color:var(--ok)}
+.chip.held{background:var(--wait-soft);color:var(--wait)}
+.chip.hold{background:var(--hold-soft);color:var(--hold)}
+details{grid-column:2/4}
+summary{cursor:pointer;font-size:13px;color:var(--accent);width:max-content;list-style:none;display:flex;align-items:center;gap:6px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"";width:0;height:0;border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s ease}
+details[open] summary::before{transform:rotate(90deg)}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+details p{margin-top:6px;font-size:14px;max-width:64ch}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:var(--muted)}
+.legend .chip{margin-right:6px}
+footer{font-size:13px;color:var(--muted);display:grid;gap:4px}
+@media (max-width:520px){.item{grid-template-columns:auto minmax(0,1fr)}.chip{grid-column:2;justify-self:start}}
+@media (prefers-reduced-motion:reduce){.meter span,summary::before{transition:none}}
+</style>
+<main>
+  <header>
+    <h1>Navan Core Data Checklist</h1>
+    <p class="lede">The data points the core data component sends to Salesforce for Navan's GBV model. Tick one when it is filling correctly on test accounts. Ticks are shared with everyone who opens this page.</p>
+    <div class="progress"><div class="meter" aria-hidden="true"><span id="meter"></span></div><span class="count" id="count">0 of 18 done</span></div>
+    <p class="note" id="sync">Loading saved progress…</p>
+    <div class="legend" id="legend"></div>
+  </header>
+  <section aria-labelledby="h-firmo"><h2 id="h-firmo">Firmographics</h2><div class="list" id="firmo"></div></section>
+  <section aria-labelledby="h-gbv"><h2 id="h-gbv">GBV model inputs</h2><div class="list" id="gbv"></div></section>
+  <footer>
+    <span>Numbers follow Navan's kickoff list. Parent accounts (#11–12) and regional headcount (#15–16) are separate components.</span>
+    <span>Built in the Core Data (Clay Services) function, Navan workspace.</span>
+  </footer>
+</main>
+<script>
+const DP = [
+  {id:"dp1", n:1, g:"firmo", name:"Company name", fields:"Clay_Company_Name__c", st:"wired",
+   a:"Clay's name for the company the identity function matched, read from its Clay profile."},
+  {id:"dp2", n:2, g:"firmo", name:"Website", fields:"Clay_Website__c", st:"wired",
+   a:"Merged by formula: the domain the identity function verified, else Clay's website, else Clay's domain."},
+  {id:"dp3", n:3, g:"firmo", name:"Employee count", fields:"Clay_Employee_Count__c · Clay_LinkedIn_Employee_Count__c · Clay_ZoomInfo_Employee_Count__c · Clay_Direct_Employee_Count__c", st:"wired",
+   a:"The PoC's order: a count from the company's own sources (AI research, used only when it finds a figure on the company's own pages), then Clay's LinkedIn count, then ZoomInfo (Salesforce value, else live), then Lusha. ZoomInfo stays behind LinkedIn because it was 5x or more off on 27% of PoC accounts."},
+  {id:"dp4", n:4, g:"firmo", name:"Industry", fields:"Clay_Industry__c", st:"wired",
+   a:"Clay's LinkedIn industry, plus Clay's derived industry and subindustry as readable context, by formula and without AI. The 12-bucket mapping follows once Navan shares the list."},
+  {id:"dp5", n:5, g:"firmo", name:"Annual revenue (USD)", fields:"Clay_Annual_Revenue_USD__c", st:"wired",
+   a:"ZoomInfo's revenue figure first, then HG Insights for 2 credits when ZoomInfo has none. HG gave a dollar figure on 86% of PoC accounts. Clay only has a range, kept as context."},
+  {id:"dp6", n:6, g:"firmo", name:"HQ city, state and country", fields:"Clay_HQ_City__c · Clay_HQ_State__c · Clay_HQ_Country__c", st:"wired",
+   a:"Read for free from the headquarters entry in Clay's company record, with no AI or web search. This replaces two AI columns from the PoC."},
+  {id:"dp7", n:7, g:"firmo", name:"HQ street address", fields:"Clay_HQ_Street_Address__c", st:"wired",
+   a:"Clay's primary address up to the HQ city, by formula."},
+  {id:"dp8", n:8, g:"firmo", name:"HQ postal code", fields:"Clay_HQ_Postal_Code__c", st:"wired",
+   a:"From Clay's headquarters entry, stored as text so leading zeros survive."},
+  {id:"dp9", n:9, g:"firmo", name:"Founded year", fields:"Clay_Founded_Year__c", st:"wired",
+   a:"Clay first, then ZoomInfo, then Lusha, with the source recorded."},
+  {id:"dp10", n:10, g:"firmo", name:"Office count", fields:"Clay_Office_Count__c", st:"wired",
+   a:"ZoomInfo's location count first, then the office locations listed on the company's Clay profile, which undercounts. The PoC's AI step counted countries, not offices, so it isn't used."},
+  {id:"dp13", n:13, g:"gbv", name:"Employee growth (12 months)", fields:"Clay_Employee_Growth_12M__c", st:"wired",
+   a:"Clay's 12-month headcount growth, looked up by Clay ID for 0.5 credits. Reported in percent."},
+  {id:"dp14", n:14, g:"gbv", name:"Number of countries", fields:"Clay_Number_of_Countries__c", st:"wired",
+   a:"Clay's employee headcount by country for 1 credit, counting the countries with at least one employee. The same lookup will feed regional headcount."},
+  {id:"dp17", n:17, g:"gbv", name:"Sales team size", fields:"Clay_Sales_Employees__c", st:"wired",
+   a:"Clay's people count for the Sales job function, by Clay ID for 0.5 credits. This is the PoC's approach, kept as is."},
+  {id:"dp18", n:18, g:"gbv", name:"Operations, engineering and finance team sizes", fields:"Clay_Operations_Employees__c · Clay_Engineering_Employees__c · Clay_Finance_Employees__c", st:"wired",
+   a:"The same people count, once per function. Clay has no Operations function, so operations uses Business Management and Operations."},
+  {id:"dp19", n:19, g:"gbv", name:"Senior leaders", fields:"Kept in the table; sent to Salesforce once Navan names a field", st:"wired",
+   a:"Clay's people count at owner, founder, C-suite, partner and VP level for 0.5 credits. The definition and the Salesforce field are still open."},
+  {id:"dp20", n:20, g:"gbv", name:"Open job postings", fields:"Clay_Current_Jobs_Posted__c", st:"wired",
+   a:"Clay's job listings for the company's LinkedIn page, counting all postings instead of sales roles only. Shows 0 when there are none. The lookup reads one column, Lookup LinkedIn, because Clay's editor shows a mapping that combines two columns (LinkedIn, else domain) as empty, even though it works."},
+  {id:"dp21", n:21, g:"gbv", name:"Latest funding amount, date and round", fields:"Clay_Latest_Funding_Amount__c · Clay_Latest_Funding_Date__c · Clay_Latest_Funding_Round__c", st:"wired",
+   a:"ZoomInfo first, then Enrich CRM (1 credit, on), then AI web research, then Crunchbase (10 credits, only when every other source is empty). Each runs only when the ones before it found no amount, and amount, date and round always come from the same provider. ZoomInfo reports money in thousands, so its figures are multiplied by 1,000."},
+  {id:"dp22", n:22, g:"gbv", name:"Total funding", fields:"Clay_Total_Funding__c", st:"wired",
+   a:"Read from the same lookups as #21 at no extra cost: ZoomInfo, then Enrich CRM, then a total the AI research finds stated on a page. Clay's funding range is kept as context."},
+];
+const CHIP = {wired:["wired","Wired"], held:["held","Waiting on approval"], hold:["hold","On hold"]};
+const state = {}; const busy = {}; let db = null; let canWrite = true;
+
+function row(d){
+  const el = document.createElement("div"); el.className = "item"; el.id = "row-" + d.id;
+  const cb = document.createElement("input"); cb.type = "checkbox"; cb.id = "cb-" + d.id;
+  cb.addEventListener("change", () => toggle(d.id, cb.checked));
+  const lab = document.createElement("label"); lab.className = "name"; lab.htmlFor = cb.id;
+  const num = document.createElement("span"); num.className = "num"; num.textContent = "#" + d.n;
+  lab.append(num, document.createTextNode(d.name));
+  const chip = document.createElement("span"); chip.className = "chip " + CHIP[d.st][0]; chip.textContent = CHIP[d.st][1];
+  const f = document.createElement("div"); f.className = "fields"; f.textContent = d.fields;
+  el.append(cb, lab, chip, f);
+  if (d.a){
+    const det = document.createElement("details"); const s = document.createElement("summary"); s.textContent = "Approach";
+    const p = document.createElement("p"); p.textContent = d.a; det.append(s, p); el.append(det);
+  } else {
+    const p = document.createElement("p"); p.className = "fields"; p.textContent = "Not in the table yet. Waiting on Navan to confirm the AI research step.";
+    el.append(p);
+  }
+  return el;
+}
+for (const d of DP) document.getElementById(d.g).append(row(d));
+const LEGEND = {wired:"built and running on Clay data", held:"built, a paid backup is switched off", hold:"not built yet"};
+for (const st of Object.keys(CHIP).filter(k => DP.some(d => d.st === k))){
+  const item = document.createElement("span"); const c = document.createElement("span");
+  c.className = "chip " + CHIP[st][0]; c.textContent = CHIP[st][1]; item.append(c, document.createTextNode(LEGEND[st]));
+  document.getElementById("legend").append(item);
+}
+
+function paint(){
+  let done = 0;
+  for (const d of DP){
+    const on = !!state[d.id]; if (on) done++;
+    const cb = document.getElementById("cb-" + d.id); cb.checked = on; cb.disabled = !canWrite;
+    document.getElementById("row-" + d.id).classList.toggle("done", on);
+  }
+  document.getElementById("count").textContent = done + " of " + DP.length + " done";
+  document.getElementById("meter").style.width = (100 * done / DP.length) + "%";
+}
+
+async function toggle(id, on){
+  state[id] = on; paint();
+  if (!db || busy[id]) return;
+  busy[id] = true;
+  try { await db.doc("checks/" + id).set({done: on, at: new Date().toISOString()}); }
+  catch (e) {
+    if (e && e.code === "invalid_argument"){ canWrite = false; note("You can view this checklist but not change it."); paint(); }
+    else note("That tick didn't save. Try again in a moment.");
+  } finally { busy[id] = false; }
+}
+function note(t){ document.getElementById("sync").textContent = t; }
+
+paint();
+(async () => {
+  const c = window.claude;
+  db = c ? await c.use("db") : null;
+  if (!db){ note("Ticks in this view stay on this screen only."); return; }
+  const user = await c.use("user");
+  if (user){ const w = await user.can("data.write"); if (w === false){ canWrite = false; } }
+  note(canWrite ? "Ticks save for everyone who opens this page." : "You can view this checklist but not change it.");
+  paint();
+  db.collection("checks").onSnapshot(snap => {
+    for (const doc of snap.docs){ if (!busy[doc.id]) state[doc.id] = !!(doc.data() || {}).done; }
+    paint();
+  }, () => note("Saved progress is unavailable right now."));
+})();
+</script>
+
+</body></html>
