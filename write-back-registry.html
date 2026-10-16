@@ -1,0 +1,197 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex, nofollow, noarchive"></head><body>
+<title>Navan Write-back Registry</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one ledger column; a status summary, function filters, then the field-by-field table */
+:root{
+  --bg:#f7f8f6; --panel:#ffffff; --ink:#1d2421; --muted:#5d6762; --faint:#8b948f; --line:#dfe4e0; --accent:#0f6b5c;
+  --built-bg:#dcf1e6; --built-fg:#13623d; --rev-bg:#e3eefb; --rev-fg:#1e4f8a; --build-bg:#fbefd6; --build-fg:#7a4f00; --add-bg:#efe8fb; --add-fg:#5a3a9a;
+  --f1:#5a6b8c; --f2:#0f6b5c; --f3:#8a4f1e; --f4:#6b3d8f;
+  --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121614; --panel:#1a201d; --ink:#e6ebe8; --muted:#a3ada8; --faint:#76807b; --line:#2b332f; --accent:#5cc4ae;
+  --built-bg:#173326; --built-fg:#86dbaa; --rev-bg:#1a2a40; --rev-fg:#9cc3f2; --build-bg:#3b2d12; --build-fg:#f2c46a; --add-bg:#2b2240; --add-fg:#c6b0f2;
+  --f1:#9fb0d0; --f2:#5cc4ae; --f3:#e0a170; --f4:#c49be6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#1a201d; --ink:#e6ebe8; --muted:#a3ada8; --faint:#76807b; --line:#2b332f; --accent:#5cc4ae;
+  --built-bg:#173326; --built-fg:#86dbaa; --rev-bg:#1a2a40; --rev-fg:#9cc3f2; --build-bg:#3b2d12; --build-fg:#f2c46a; --add-bg:#2b2240; --add-fg:#c6b0f2;
+  --f1:#9fb0d0; --f2:#5cc4ae; --f3:#e0a170; --f4:#c49be6; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+header{display:grid;gap:8px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:30px;line-height:1.15;margin:0;text-wrap:balance;font-weight:700}
+.lede{color:var(--muted);max-width:68ch;margin:0}
+.summary{display:flex;flex-wrap:wrap;gap:10px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;min-width:150px;display:grid;gap:2px}
+.stat b{font-size:24px;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+.stat small{font-size:12px;color:var(--faint)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:inherit;font-size:13px;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.chip b{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+.chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.chip:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=search]{font:inherit;font-size:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);min-width:0;flex:1 1 220px;max-width:340px}
+.count{font-size:13px;color:var(--muted);margin-left:auto}
+.table-box{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:1100px}
+td.aud{min-width:210px}
+td.fld{min-width:250px}
+.kv{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--faint)}
+.kv i{font-style:normal;width:68px;flex:none}
+.kv .mono{font-family:var(--mono)}
+.todo{display:inline-block;margin-top:4px;font-size:12px;font-weight:600;color:var(--add-fg);background:var(--add-bg);padding:1px 8px;border-radius:999px}
+.albl{display:block;font-weight:500}
+.aid{display:block;font-size:12px;color:var(--faint)}
+table.mini{min-width:760px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
+th{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);background:var(--panel);position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;color:var(--muted);width:44px}
+td.mono{font-family:var(--mono);font-size:13px;white-space:nowrap}
+td.col{font-weight:600}
+td.note{color:var(--muted);font-size:13px;max-width:38ch}
+.fn{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;font-size:11px;font-weight:700;color:var(--panel)}
+.fn1{background:var(--f1)} .fn2{background:var(--f2)} .fn3{background:var(--f3)} .fn4{background:var(--f4)} .fn5{background:var(--accent)}
+.pill{display:inline-block;white-space:nowrap;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.pill.built{background:var(--built-bg);color:var(--built-fg)} .pill.rev{background:var(--rev-bg);color:var(--rev-fg)}
+.pill.building{background:var(--build-bg);color:var(--build-fg)} .pill.adding{background:var(--add-bg);color:var(--add-fg)}
+h2{font-size:18px;margin:0}
+section{display:grid;gap:12px}
+.fine{font-size:13px;color:var(--muted);margin:0;max-width:80ch}
+@media (max-width:600px){h1{font-size:24px}.count{margin-left:0;width:100%}}
+details{border:0}
+summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;flex:none}
+details[open]>summary::before{transform:rotate(45deg)}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+summary b{font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+details.outer{display:grid;gap:12px}
+details.outer[open]{display:grid}
+details.outer>summary h2{display:inline-flex;align-items:center;gap:8px}
+details.outer[open]>*+*{margin-top:12px}
+.fngroup{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.fngroup>summary{font-weight:600;font-size:14px}
+.fngroup[open]>.table-box{margin-top:12px;border:0;border-top:1px solid var(--line);border-radius:0}
+
+@media (prefers-reduced-motion: reduce){summary::before{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Navan account enrichment · Salesforce write-back</div>
+    <h1>Every write-back field, traced to the function and column that fills it</h1>
+    <p class="lede">The 38 fields on the kickoff write-back mapping, plus the two industry fields agreed on Oct 13. Each row names the Clay function and the output column whose value is written to that Salesforce field. Regional headcount now sits inside Enrich Core GBV Data, next to the country data it is built from.</p>
+  </header>
+
+  <div class="summary" aria-label="Status summary">
+    <div class="stat"><b>40</b><span>write-back fields</span></div>
+    <div class="stat"><b>40</b><span>built, column in place</span></div>
+    <div class="stat"><b>16</b><span>extra fields available</span><small>Context for human and agent review</small></div>
+      </div>
+
+  <section aria-label="Field registry">
+    <div class="controls">
+      <button type="button" class="chip" data-f="2" aria-pressed="false"><span class="fn fn2">2</span> Enrich Core GBV Data <b>38</b></button><button type="button" class="chip" data-f="3" aria-pressed="false"><span class="fn fn3">3</span> Find Parent Accounts <b>2</b></button>
+      <input type="search" id="q" placeholder="Search a field or column" aria-label="Search a field or column">
+      <span class="count" id="count"></span>
+    </div>
+    <div class="table-box">
+      <table>
+        <thead><tr><th>#</th><th>Field · Salesforce and Audience</th><th>Function</th><th>Output column</th><th>Status</th><th>How it's filled</th></tr></thead>
+        <tbody id="rows">
+<tr data-fn="2" data-st="built"><td class="num">1</td><td class="fld"><span class="albl">Clay - Company Name</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Company_Name__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rmeBa7FkYURasd</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Name</td><td><span class="pill built">Built</span></td><td class="note"></td></tr>
+<tr data-fn="2" data-st="built"><td class="num">2</td><td class="fld"><span class="albl">Clay - Website</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Website__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tm8xvifoGC9f4MJKQd</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Valid Website</td><td><span class="pill built">Built</span></td><td class="note"></td></tr>
+<tr data-fn="2" data-st="built"><td class="num">3</td><td class="fld"><span class="albl">Clay - Employee Count</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employee_Count__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tm8xwd4v7GXXx3ZoNx</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Final Employee Count</td><td><span class="pill built">Built</span></td><td class="note">The company&#x27;s own stated total when web research finds it; else ZoomInfo when LinkedIn clearly undercounts; else LinkedIn, ZoomInfo, Lusha</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">3</td><td class="fld"><span class="albl">Clay - LinkedIn Employee Count</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_LinkedIn_Employee_Count__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rmxKfbbCmT5yeM</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employee Count (LinkedIn)</td><td><span class="pill built">Built</span></td><td class="note">LinkedIn&#x27;s count, from Clay&#x27;s company data</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">3</td><td class="fld"><span class="albl">Clay - ZoomInfo Employee Count</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_ZoomInfo_Employee_Count__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rmwhuyJwVBMCUu</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">ZoomInfo Employee Count</td><td><span class="pill built">Built</span></td><td class="note">The Salesforce ZoomInfo value when passed in, else a live ZoomInfo lookup</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">3</td><td class="fld"><span class="albl">Clay - Direct Employee Count</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Direct_Employee_Count__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rnH9Pwy8qejD3n</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Direct Employee Count</td><td><span class="pill built">Built</span></td><td class="note">The company&#x27;s own stated total (10-K, annual report or its own site), found by the Employee Count Check web research; blank when the company states none</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">4</td><td class="fld"><span class="albl">Clay - Industry</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Industry__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tm8xxcYCvoMvVaWpSi</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Industry</td><td><span class="pill built">Built</span></td><td class="note">Raw LinkedIn industry; the 13-industry grouping is the new field below</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">4</td><td class="fld"><span class="albl">Clay - Industry Grouping</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Industry_Grouping__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rnExDE8wVnYNz2</span></span><span class="todo">Not in Salesforce yet: name inferred, Navan to create</span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Clay Industry Grouping</td><td><span class="pill built">Built</span></td><td class="note">One of Navan&#x27;s 13 approved industries by Navan&#x27;s own exact lookup: LinkedIn industry, then ZoomInfo, then No Data</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">4</td><td class="fld"><span class="albl">Clay - Industry Detail</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Industry_Detail__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09roTbz6WKDN7Crc</span></span><span class="todo">Not in Salesforce yet: name inferred, Navan to create</span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Clay Industry Detail</td><td><span class="pill built">Built</span></td><td class="note">The LinkedIn or ZoomInfo industry value that matched</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">5</td><td class="fld"><span class="albl">Clay - Annual Revenue USD</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Annual_Revenue_USD__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09roKXZ3odixbtF7</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Company Revenue</td><td><span class="pill built">Built</span></td><td class="note">ZoomInfo first, used only when ZoomInfo matched this company (not a parent or sister on the same domain), then HG Insights</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">6</td><td class="fld"><span class="albl">Clay - HQ City</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_HQ_City__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rpdNpwydyphgz4</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">HQ City</td><td><span class="pill built">Built</span></td><td class="note"></td></tr>
+<tr data-fn="2" data-st="built"><td class="num">6</td><td class="fld"><span class="albl">Clay - HQ State</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_HQ_State__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tmfyrqnaAo7tXhumTW</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">HQ State/Region</td><td><span class="pill built">Built</span></td><td class="note"></td></tr>
+<tr data-fn="2" data-st="built"><td class="num">6</td><td class="fld"><span class="albl">Clay - HQ Country</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_HQ_Country__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rpUF7qgG6xuQ4H</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">HQ Country</td><td><span class="pill built">Built</span></td><td class="note"></td></tr>
+<tr data-fn="2" data-st="built"><td class="num">7</td><td class="fld"><span class="albl">Clay - HQ Street Address</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_HQ_Street_Address__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rqWV2QPNPzQajb</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">HQ Street Address</td><td><span class="pill built">Built</span></td><td class="note"></td></tr>
+<tr data-fn="2" data-st="built"><td class="num">8</td><td class="fld"><span class="albl">Clay - HQ Postal Code</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_HQ_Postal_Code__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rqeiXjRpExkdix</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">HQ Postal Code</td><td><span class="pill built">Built</span></td><td class="note">Kept as text, so leading zeros survive</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">9</td><td class="fld"><span class="albl">Clay - Founded Year</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Founded_Year__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rrERxK3Azqjw2F</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Founded Year</td><td><span class="pill built">Built</span></td><td class="note">Clay, then ZoomInfo, then Lusha</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">10</td><td class="fld"><span class="albl">Clay - Office Count</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Office_Count__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rrYMviBqkt9i6k</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Final Office Count</td><td><span class="pill built">Built</span></td><td class="note">Physical offices (stores, branches and clinics are listed in the reason, not counted), checked by web research against ZoomInfo</td></tr>
+<tr data-fn="3" data-st="built"><td class="num">11</td><td class="fld"><span class="albl">Clay - Parent Account</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Parent_Account__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rsyv4H4Yq89RR9</span></span></td><td><span class="fn fn3">3</span> Find Parent Accounts</td><td class="col">Parent Account ID</td><td><span class="pill built">Built</span></td><td class="note">Salesforce Account ID of the parent, on an exact single match</td></tr>
+<tr data-fn="3" data-st="built"><td class="num">12</td><td class="fld"><span class="albl">Clay - Ultimate Parent</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Ultimate_Parent__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rtdAtXQTshJAcX</span></span></td><td><span class="fn fn3">3</span> Find Parent Accounts</td><td class="col">Ultimate Parent Account ID</td><td><span class="pill built">Built</span></td><td class="note">Salesforce Account ID of the ultimate parent, on an exact single match</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">13</td><td class="fld"><span class="albl">Clay - Employee Growth 12M</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employee_Growth_12M__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rt32msRfB6WV36</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Percent Employee Growth Over Last 12 Months</td><td><span class="pill built">Built</span></td><td class="note"></td></tr>
+<tr data-fn="2" data-st="built"><td class="num">14</td><td class="fld"><span class="albl">Clay - Number of Countries</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Number_of_Countries__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09ruQ3GKqUyVwgnQ</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Number of Countries</td><td><span class="pill built">Built</span></td><td class="note">Countries with at least one employee</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">15</td><td class="fld"><span class="albl">Clay - Employees North America</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_North_America__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rutnn4FjCaxq3T</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: North America</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">15</td><td class="fld"><span class="albl">Clay - Employees DACH</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_DACH__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rwPDbRjVcs9K44</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: DACH</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">15</td><td class="fld"><span class="albl">Clay - Employees Nordics</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_Nordics__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rwXBjkWU5TCDa7</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: Nordics</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">15</td><td class="fld"><span class="albl">Clay - Regional Headcount Analysis</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Regional_Headcount_Analysis__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rxFVZE4XqND3Wp</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Regional Headcount Summary</td><td><span class="pill built">Built</span></td><td class="note">Format proposed by Clay, for Navan to confirm</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">16</td><td class="fld"><span class="albl">Clay - Employees UKI</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_UKI__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rxWBwXsChGVMFf</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: UKI</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">16</td><td class="fld"><span class="albl">Clay - Employees France</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_France__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09ryFTTYteUTf7pw</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: France</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">16</td><td class="fld"><span class="albl">Clay - Employees Benelux</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_Benelux__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09ryyPx3ecGWjMeC</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: Benelux</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">16</td><td class="fld"><span class="albl">Clay - Employees APAC</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_APAC__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rzzgFhKjKwfGsY</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: APAC</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">16</td><td class="fld"><span class="albl">Clay - Employees India</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_India__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09rzgSpKTcxE8wUv</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: India</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">16</td><td class="fld"><span class="albl">Clay - Employees Canada</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Employees_Canada__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s06QSDYJ3CdWwq</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Employees: Canada</td><td><span class="pill built">Built</span></td><td class="note">From the same headcount-by-country data as Number of Countries</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">17</td><td class="fld"><span class="albl">Clay - Sales Employees</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Sales_Employees__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s0xJxWyyWokH39</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Current Size of Sales Team</td><td><span class="pill built">Built</span></td><td class="note">Job-function filters to be tuned by Navan</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">18</td><td class="fld"><span class="albl">Clay - Operations Employees</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Operations_Employees__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s08pfcDeoKJ6Si</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Operations Team Size</td><td><span class="pill built">Built</span></td><td class="note">Job-function filters to be tuned by Navan</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">18</td><td class="fld"><span class="albl">Clay - Engineering Employees</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Engineering_Employees__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s1t62FYZpUSkH9</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Engineering Team Size</td><td><span class="pill built">Built</span></td><td class="note">Job-function filters to be tuned by Navan</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">18</td><td class="fld"><span class="albl">Clay - Finance Employees</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Finance_Employees__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s1q68jihUJiPkp</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Finance Team Size</td><td><span class="pill built">Built</span></td><td class="note">Job-function filters to be tuned by Navan</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">20</td><td class="fld"><span class="albl">Clay - Current Jobs Posted</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Current_Jobs_Posted__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s2dDF4XVposqUv</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Open Job Postings</td><td><span class="pill built">Built</span></td><td class="note">All postings on the company LinkedIn page</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">21</td><td class="fld"><span class="albl">Clay - Latest Funding Amount</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Latest_Funding_Amount__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s2n83ahgri8cTY</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Latest Funding</td><td><span class="pill built">Built</span></td><td class="note">ZoomInfo, Enrich CRM, AI research, then Crunchbase</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">21</td><td class="fld"><span class="albl">Clay - Latest Funding Date</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Latest_Funding_Date__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s39yEnUpYqiMaS</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Last Funding Date</td><td><span class="pill built">Built</span></td><td class="note">Same source as the amount</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">21</td><td class="fld"><span class="albl">Clay - Latest Funding Round</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Latest_Funding_Round__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s3VxJ5X43F3RPr</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Last Funding Round</td><td><span class="pill built">Built</span></td><td class="note">Same source as the amount</td></tr>
+<tr data-fn="2" data-st="built"><td class="num">22</td><td class="fld"><span class="albl">Clay - Total Funding</span><span class="kv"><i>Salesforce</i><span class="mono">Clay_Total_Funding__c</span></span><span class="kv"><i>Audience</i><span class="mono">audf_0tn09s4e36nDjgDKuav</span></span></td><td><span class="fn fn2">2</span> Enrich Core GBV Data</td><td class="col">Total Funding</td><td><span class="pill built">Built</span></td><td class="note"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fine">Each field has the same name in Salesforce and on the Clay company Audience. Under the name: the Salesforce API name, then the Audience field id. Values land on the Audience first, for RevOps and account-agent QA and fill-rate checks; the Audience fields are mapped to Salesforce in the write-back phase, after testing. # is the data point number on the kickoff mapping. Data point 19, senior leaders, is built but has no Salesforce field yet, so it is listed under extra fields. EMEA has no regional field on the mapping; EMEA headcount appears in the regional summary.</p>
+  </section>
+
+  <section aria-label="Extra outputs">
+    <details class="outer">
+      <summary><h2>Extra fields we return, beyond the 40 <b>16</b></h2></summary>
+      <p class="fine">Not on Navan's write-back mapping. Each has its own field on the Clay company Audience, next to the mirrored fields. They add the context behind each value: which source won, why we trust it, and what to check. That lets a person on RevOps or an AI agent review a value before it reaches Salesforce. Open a function to see its fields.</p>
+<details class="fngroup"><summary><span class="fn fn1">1</span> Match Company Identity <b>5</b></summary><div class="table-box"><table class="mini"><thead><tr><th>Output</th><th>Audience field</th><th>What it tells you</th></tr></thead><tbody><tr><td class="col">Final Clay ID</td><td class="aud"><span class="albl">Clay - Final Clay ID</span><span class="mono aid">audf_0tn09s46bgagKXUCCJJ</span></td><td class="note">The verified Clay company every other function runs on</td></tr><tr><td class="col">Clay ID Status</td><td class="aud"><span class="albl">Clay - Clay ID Status</span><span class="mono aid">audf_0tn09s4mjFSDx7PQC72</span></td><td class="note">Whether the identity was confirmed, corrected or not found</td></tr><tr><td class="col">Clay ID Reason</td><td class="aud"><span class="albl">Clay - Clay ID Reason</span><span class="mono aid">audf_0tn09s5pVanzwcEQXby</span></td><td class="note">Result, how it was matched and why we trust it, in plain sentences</td></tr><tr><td class="col">Final Domain</td><td class="aud"><span class="albl">Clay - Final Domain</span><span class="mono aid">audf_0tn09s5MnSEJYiZ9kPR</span></td><td class="note">The verified website domain</td></tr><tr><td class="col">Final LinkedIn URL</td><td class="aud"><span class="albl">Clay - Final LinkedIn URL</span><span class="mono aid">audf_0tn09s6cCkx2YeVCXCV</span></td><td class="note">The verified LinkedIn company page</td></tr></tbody></table></div></details>
+<details class="fngroup"><summary><span class="fn fn2">2</span> Enrich Core GBV Data <b>6</b></summary><div class="table-box"><table class="mini"><thead><tr><th>Output</th><th>Audience field</th><th>What it tells you</th></tr></thead><tbody><tr><td class="col">Employee Count Reason</td><td class="aud"><span class="albl">Clay - Employee Count Reason</span><span class="mono aid">audf_0tn09s6sXXv9TiqNeZH</span></td><td class="note">Which source won and why, with the company&#x27;s own page when web research found it</td></tr><tr><td class="col">Regional Headcount Reason</td><td class="aud"><span class="albl">Clay - Regional Headcount Reason</span><span class="mono aid">audf_0tn09s7hoaFzzJ5xQ3y</span></td><td class="note">How the regional split was built and whether web research confirmed it</td></tr><tr><td class="col">Office Count Reason</td><td class="aud"><span class="albl">Clay - Office Count Reason</span><span class="mono aid">audf_0tn09s7wbjxTpHdwaxv</span></td><td class="note">How the office count was reached; stores, branches and clinics are noted here, not counted</td></tr><tr><td class="col">Industry Reason</td><td class="aud"><span class="albl">Clay - Industry Reason</span><span class="mono aid">audf_0tn09s8Te7guSfKjMMe</span></td><td class="note">Which industry value matched Navan&#x27;s list (LinkedIn, then ZoomInfo), exact match only</td></tr><tr><td class="col">Revenue Reason</td><td class="aud"><span class="albl">Clay - Revenue Reason</span><span class="mono aid">audf_0tn09s9EPWXgJA7Y5ie</span></td><td class="note">Which provider gave the revenue, and why ZoomInfo was skipped when it matched another company</td></tr><tr><td class="col">HQ Location Reason</td><td class="aud"><span class="albl">Clay - HQ Location Reason</span><span class="mono aid">audf_0tn09sakni5oXvAPf7H</span></td><td class="note">Where the HQ came from, and whether ZoomInfo agrees (flags a mismatch before territory assignment)</td></tr></tbody></table></div></details>
+<details class="fngroup"><summary><span class="fn fn5">5</span> Account Enrichment workflow <b>1</b></summary><div class="table-box"><table class="mini"><thead><tr><th>Output</th><th>Audience field</th><th>What it tells you</th></tr></thead><tbody><tr><td class="col">Review Flag</td><td class="aud"><span class="albl">Clay - Review Flag</span><span class="mono aid">audf_0tn0g086PpkRqVUZAaX</span></td><td class="note">One plain label per issue for RevOps to work, blank when the account is clean: why identity failed (for example &#x27;Identity: no website or LinkedIn&#x27;), or a successor company, a parent not in Salesforce or with duplicate accounts, no industry match, or an HQ that is missing or differs from ZoomInfo</td></tr></tbody></table></div></details>
+<details class="fngroup"><summary><span class="fn fn3">3</span> Find Parent Accounts <b>4</b></summary><div class="table-box"><table class="mini"><thead><tr><th>Output</th><th>Audience field</th><th>What it tells you</th></tr></thead><tbody><tr><td class="col">Parent Status</td><td class="aud"><span class="albl">Clay - Parent Status</span><span class="mono aid">audf_0tn09saWwEDzKYxBthp</span></td><td class="note">Why a parent is filled or blank: Parent matched, Parent not in Salesforce, Parent has duplicate accounts, Top-level company, Parent not found, Identity not resolved</td></tr><tr><td class="col">Parent Name</td><td class="aud"><span class="albl">Clay - Parent Name</span><span class="mono aid">audf_0tn09sbrBzogTKix2r5</span></td><td class="note">The parent company&#x27;s name, even when it is not in Salesforce</td></tr><tr><td class="col">Ultimate Parent Name</td><td class="aud"><span class="albl">Clay - Ultimate Parent Name</span><span class="mono aid">audf_0tn09sbiQrV5PXKXxGE</span></td><td class="note">The top company&#x27;s name, even when it is not in Salesforce</td></tr><tr><td class="col">Parent Reason</td><td class="aud"><span class="albl">Clay - Parent Reason</span><span class="mono aid">audf_0tn09sbpdx7wH3rfMwx</span></td><td class="note">Result, how the parent was found and why we trust it, with the source page when web research found it</td></tr></tbody></table></div></details>
+      <details class="fngroup"><summary>Built inside a function, not returned yet <b>2</b></summary>
+        <div class="table-box"><table class="mini"><thead><tr><th>Function</th><th>Columns</th><th>Status</th></tr></thead><tbody>
+<tr><td>Enrich Core GBV Data</td><td class="col"># Senior Leaders</td><td class="note">Data point 19 (VP and above). Built, but not returned until Navan creates a Salesforce field for it.</td></tr><tr><td>Enrich Core GBV Data</td><td class="col">Employee Count Source, Revenue Source, Founded Year Source, Office Count Source, Funding Source</td><td class="note">Which provider won each waterfall. Summarised in the reason fields; can be returned on their own if Navan adds fields.</td></tr>
+        </tbody></table></div>
+      </details>
+    </details>
+  </section>
+</div>
+
+<script>
+(function(){
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#rows tr'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var q = document.getElementById('q'), count = document.getElementById('count');
+  var active = null;
+  function apply(){
+    var term = (q.value || '').trim().toLowerCase(), shown = 0;
+    rows.forEach(function(r){
+      var ok = (!active || r.getAttribute('data-fn') === active) && (!term || r.textContent.toLowerCase().indexOf(term) !== -1);
+      r.hidden = !ok; if (ok) shown++;
+    });
+    count.textContent = shown + ' of ' + rows.length + ' fields';
+  }
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      active = active === c.getAttribute('data-f') ? null : c.getAttribute('data-f');
+      chips.forEach(function(x){ x.setAttribute('aria-pressed', String(x.getAttribute('data-f') === active)); });
+      apply();
+    });
+  });
+  q.addEventListener('input', apply);
+  apply();
+})();
+</script>
+
+</body></html>
