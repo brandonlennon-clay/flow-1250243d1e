@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Navan Parent Accounts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one row of five steps, a drill-down panel under it, then DRiV traced through the same five columns. */
+:root {
+  --bg: #FEFDFB; --surface: #FFFFFF; --sunk: #F4F3F0; --line: #E6E3DE; --ink: #1B1A18; --muted: #75726C;
+  --ai: #6D4CD6; --ai-soft: #F3F0FF; --clay: #007F9E; --clay-soft: #ECFAFD; --sf: #395AFA; --sf-soft: #EEF4FF;
+  --warn: #B8323F; --warn-soft: #FFF1F2; --ok: #5F6B00; --ok-soft: #F7FADF;
+  --f-display: "Figtree", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Figtree", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #1B1A18; --surface: #23221F; --sunk: #2A2925; --line: #3A3833; --ink: #F4F3F0; --muted: #A7A39B;
+  --ai: #B49BFB; --ai-soft: #2A2240; --clay: #5FD8F5; --clay-soft: #102A30; --sf: #8DA2FF; --sf-soft: #18203D;
+  --warn: #FF8A93; --warn-soft: #3A181C; --ok: #D3DE4A; --ok-soft: #262A0E; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #1B1A18; --surface: #23221F; --sunk: #2A2925; --line: #3A3833; --ink: #F4F3F0; --muted: #A7A39B;
+  --ai: #B49BFB; --ai-soft: #2A2240; --clay: #5FD8F5; --clay-soft: #102A30; --sf: #8DA2FF; --sf-soft: #18203D;
+  --warn: #FF8A93; --warn-soft: #3A181C; --ok: #D3DE4A; --ok-soft: #262A0E; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 40px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+p { margin: 0; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--muted); font-size: 16px; max-width: 60ch; }
+header { display: grid; gap: 10px; }
+.mono { font-family: var(--f-mono); font-size: 12.5px; }
+
+/* the five-step row and the DRiV row share these columns */
+.cols { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.step { position: relative; text-align: left; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 14px 16px; cursor: pointer; display: grid; gap: 6px; align-content: start; transition: border-color .15s, box-shadow .15s; }
+.step:hover { border-color: var(--muted); }
+.step:focus-visible { outline: 2px solid var(--sf); outline-offset: 2px; }
+.step[aria-selected="true"] { border-color: var(--k); box-shadow: 0 0 0 1px var(--k) inset; }
+.step:not(:last-child)::after { content: ""; position: absolute; right: -12px; top: 30px; width: 10px; height: 10px; border-top: 2px solid var(--line); border-right: 2px solid var(--line); transform: rotate(45deg); }
+.step .t { font-family: var(--f-display); font-weight: 650; font-size: 16px; line-height: 1.25; }
+.step .s { font-size: 13px; color: var(--muted); }
+.map { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.kind { justify-self: start; font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: var(--k); background: var(--ks); }
+.k-clay { --k: var(--clay); --ks: var(--clay-soft); }
+.k-ai { --k: var(--ai); --ks: var(--ai-soft); }
+.k-sf { --k: var(--sf); --ks: var(--sf-soft); }
+.step.k-ai { background: linear-gradient(var(--ai-soft), var(--surface) 70%); }
+
+.scope { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); margin-top: -12px; }
+.scope b { font-weight: 600; margin-right: 4px; }
+.chip { display: inline-block; font-size: 12.5px; padding: 2px 9px; border-radius: 999px; background: var(--sunk); color: var(--muted); border: 1px solid var(--line); }
+
+/* drill-down panel */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: grid; gap: 18px; border-top: 3px solid var(--k); }
+.ph { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: baseline; }
+.ph h3 { font-size: 22px; font-weight: 700; }
+.ph .meta { color: var(--muted); font-size: 13.5px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 22px; }
+.blk { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.lbl { font-size: 11.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.in { font-size: 12.5px; padding: 2px 9px; border-radius: 6px; background: var(--sunk); border: 1px solid var(--line); }
+ol.does, ul.does { margin: 0; padding-left: 20px; display: grid; gap: 5px; }
+ul.does { list-style: none; padding-left: 0; }
+ul.does li { padding-left: 16px; position: relative; }
+ul.does li::before { content: ""; position: absolute; left: 2px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--k); }
+.rules { display: grid; gap: 6px; }
+.rule { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; padding: 8px 10px; border-radius: 8px; background: var(--sunk); font-size: 14px; }
+.rule .to { font-family: var(--f-mono); font-size: 12px; color: var(--k); text-align: right; }
+.schema { background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 7px; overflow-x: auto; }
+.row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.row .f { font-family: var(--f-mono); font-size: 12.5px; font-weight: 500; }
+.row .v { display: flex; flex-wrap: wrap; gap: 4px; }
+.e { font-family: var(--f-mono); font-size: 11.5px; padding: 1px 6px; border-radius: 4px; background: var(--surface); border: 1px solid var(--line); }
+.guard { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 10px 12px; border-radius: 0 8px 8px 0; display: grid; gap: 4px; font-size: 14px; }
+.foot { font-size: 13px; color: var(--muted); }
+
+/* DRiV trace */
+.trace { display: grid; gap: 12px; }
+.cell { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; font-size: 13.5px; min-width: 0; cursor: pointer; }
+.cell:hover { border-color: var(--muted); }
+.cell .n { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.cell .big { font-family: var(--f-display); font-weight: 650; font-size: 16px; line-height: 1.25; }
+.cell.bad { background: var(--warn-soft); border-color: transparent; }
+.cell.bad .big { color: var(--warn); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.cell.good { background: var(--ai-soft); border-color: transparent; }
+.cell.done { background: var(--ok-soft); border-color: transparent; }
+q { font-style: italic; }
+
+.results { display: flex; flex-wrap: wrap; gap: 12px 36px; align-items: baseline; padding-top: 18px; border-top: 1px solid var(--line); }
+.stat { display: grid; gap: 2px; }
+.stat .v { font-family: var(--f-display); font-weight: 700; font-size: 26px; font-variant-numeric: tabular-nums; }
+.stat .v small { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 6px; }
+.stat .l { font-size: 13px; color: var(--muted); }
+
+.full { border: 1px solid var(--line); border-radius: 8px; background: var(--sunk); }
+.full summary { cursor: pointer; padding: 10px 14px; font-weight: 600; font-size: 14px; color: var(--k); }
+.full summary:focus-visible { outline: 2px solid var(--sf); outline-offset: 2px; }
+.full pre { margin: 0; padding: 4px 14px 14px; max-height: 420px; overflow: auto; white-space: pre-wrap; word-break: break-word; font-family: var(--f-mono); font-size: 12px; line-height: 1.55; color: var(--ink); }
+@media (max-width: 860px) {
+  .cols { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .step:not(:last-child)::after { right: auto; left: 24px; top: auto; bottom: -9px; transform: rotate(135deg); }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .trace .cols .cell::before { content: attr(data-step); font-size: 11px; font-weight: 600; color: var(--muted); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Navan · Account enrichment · Parent accounts</span>
+    <h1>How a parent account is found</h1>
+    <p class="lede">Steps 1 to 5 of your process map, with one Claygent doing the research. Click a step to see how it's set up.</p>
+  </header>
+
+  <section aria-label="The five steps">
+    <div class="cols" role="tablist" id="steps"></div>
+  </section>
+  <div class="scope"><b>Not in this build:</b>
+    <span class="chip">6 Co-HQ</span><span class="chip">7 Contracting</span><span class="chip">8 Anti-ICP</span><span class="chip">9 Duplicates</span><span class="chip">10 Merger</span><span class="chip">11 Graduation</span><span class="chip">12 Rebrand</span><span class="chip">13 AI-native</span>
+  </div>
+
+  <section class="panel" id="panel" role="tabpanel" aria-live="polite"></section>
+
+  <section class="trace" aria-label="DRiV end to end">
+    <h2>One account, end to end: DRiV Incorporated</h2>
+    <div class="cols">
+      <div class="cell" data-k="resolve" data-step="Resolve">
+        <span class="n">Resolve</span>
+        <span class="big">Matched</span>
+        <span>driv.com · linkedin.com/company/drivautomotive · Southfield, US</span>
+      </div>
+      <div class="cell bad" data-k="chain" data-step="Clay's chain">
+        <span class="n">Clay's chain</span>
+        <span class="big">Apollo Global Management</span>
+        <span>Clay alone would write this. Apollo is the investor, not the owner.</span>
+      </div>
+      <div class="cell good" data-k="research" data-step="Hierarchy Research">
+        <span class="n">Hierarchy Research</span>
+        <span class="big">Tenneco</span>
+        <span><q>DRiV, a Tenneco company</q> on DRiV's LinkedIn page. Sponsor: Apollo, since 2022-11-17. High confidence.</span>
+      </div>
+      <div class="cell" data-k="match" data-step="Source + Salesforce">
+        <span class="n">Source + Salesforce</span>
+        <span class="big">Parent matched</span>
+        <span>AI research wins. Tenneco matches one Navan account.</span>
+      </div>
+      <div class="cell done" data-k="write" data-step="Written">
+        <span class="n">Written</span>
+        <span class="big">Tenneco · Apollo</span>
+        <span>Parent and ultimate parent: Tenneco. Investor/Owner: Apollo. Branch/division, Active. Record Validated: Yes.</span>
+      </div>
+    </div>
+    <p class="foot">Matches your tab. Cost: 2 Clay credits for the hierarchy lookup and $0.005 of OpenAI on your key, 96 seconds.</p>
+  </section>
+
+  <section class="results" aria-label="Test results">
+    <span class="eyebrow" style="flex-basis:100%">NA Enterprise QA run · 313 accounts · Oct 22</span>
+    <div class="stat"><span class="v">313<small>of 313</small></span><span class="l">ran to completion</span></div>
+    <div class="stat"><span class="v">305<small>97%</small></span><span class="l">Record Validated: Yes</span></div>
+    <div class="stat"><span class="v">101</span><span class="l">parents written to a Navan account</span></div>
+    <div class="stat"><span class="v">~12</span><span class="l">data credits per account, whole workflow</span></div>
+  </section>
+</div>
+
+<script type="text/plain" id="prompt-text">#Variables#
+$name = {{Company Name}}
+$domain = {{Company Domain}}
+$linkedin = {{Company LinkedIn URL}}
+$hq = {{HQ Location}}
+$clayChain = {{Clay Parent Chain}}
+$hg = {{HG Insights Leads}}
+$hh = {{HitHorizons Leads}}
+
+#Context#
+You are an expert corporate-ownership research analyst. You research ONE company: $name (the name in Navan's CRM, often the legal name with a suffix such as LLC, Inc. or GmbH), website $domain, LinkedIn page $linkedin, headquartered in $hq. Your answer fills two Salesforce fields for this account, its parent account and its ultimate parent account, so the companies you name must be real operating owners that a sales team would treat as the account's corporate family. You use searchGoogle and visitWebpage, and you report only facts you read on a page in this run.
+
+Leads you may use, never as proof: $clayChain is Clay's hierarchy data for the company (each line: distance from the company, name, domain); it is sometimes stale or names an investor, a sister entity or the wrong legal entity. $hg (HG Insights) and $hh (HitHorizons, Europe only) are corporate-structure records that exist only when Clay's data had no parent. Any lead can be empty.
+
+#Objective#
+Return the JSON object in #Return Format#: the company that directly owns $name today (its immediate parent) and the operating company at the top of that ownership chain (its ultimate parent), each with its own domain, LinkedIn page and HQ country; any financial sponsor that owns the chain, reported separately; how the company relates to its parent, what kind of entity it is and whether it still operates; and whether Clay's chain held up.
+
+#Instructions#
+1. Confirm the company. visitWebpage https://$domain (when $domain is empty, use $linkedin; when both are empty, searchGoogle "$name official website"). Note its name, location and what it does, so you never confuse it with a similarly named company.
+2. Read the leads. List every owner named in $clayChain, $hg and $hh. These are what you check first, not answers.
+3. Find today's owner. On the company's own site check the footer, About, investor and legal pages for "a subsidiary of", "a division of", "part of", "a member of", "an X company" or "acquired by". Then searchGoogle "$name parent company" and "$name acquired by". For a listed company or a listed owner, check its annual report or 10-K (Exhibit 21 lists subsidiaries). Outside the US use the country registry when needed (Companies House, Handelsregister, KVK, Infogreffe, OpenCorporates). Prefer, in order: the company's or the owner's own pages and filings, a registry, a reputable news outlet or wire service.
+4. Check the date. Ownership changes: when sources disagree, the most recent dated source wins (a sale, spin-off or merger replaces the older owner). Record the date of the evidence you rely on as asOfDate.
+5. Climb. Open the owner's site to confirm the relationship from its side when you can, then repeat step 3 for the owner until you reach an operating company that no other operating company owns. That company is the ultimate parent. When the immediate parent is the top, repeat it as the ultimate parent.
+6. Set financial sponsors aside. A private equity firm, venture capital fund, hedge fund, family office or sovereign wealth fund never sits in the chain. When one owns the company or its top operating owner, put the largest such owner in financialSponsor (with its domain and LinkedIn page) and stop the chain at the operating company below it. A company owned only by a sponsor has verdict "top_level"; the sponsor goes in financialSponsor.
+7. Apply the special cases. Holding companies and roll-up acquirers that operate or own a portfolio of operating businesses (for example Berkshire Hathaway, Bending Spoons) ARE parents. A fully absorbed acquisition: the acquirer is the parent and operationalStatus is "Absorbed". A regional division, branch or office: the operating company it belongs to is the parent. A joint venture: the owner with the larger stake (or the one that consolidates it) is the immediate parent; name the other owners in reasoning. A franchisee: the franchisor is NOT a parent unless it owns the location; use relationshipType "Franchise" and name the franchisor in reasoning. A member firm of a professional-services network (an accounting, legal or consulting network) or a club in a federation (a regional auto club in a national federation): the network or federation entity is the immediate and ultimate parent, with relationshipType "Other affiliation" and verdict "has_parent", even when the member is independently owned.
+8. Find each parent's domain (bare root host) and LinkedIn company page: searchGoogle "<parent name> LinkedIn" and keep the linkedin.com/company/ URL that names that parent.
+9. Compare with Clay. clayChainVerdict is "agrees" when your immediate and ultimate parents match Clay's nearest and furthest entries (same company, even under a different legal name), "corrected" when they differ, and "no_clay_data" when $clayChain is empty.
+10. Write one executionLogs line per search or page: "<what you looked for>: <what you found> (<URL>)".
+
+#Guardrails#
+**NEVER** use training data or memory for any field. Every parent, sponsor and date MUST come from a URL you opened in this run.
+**NEVER** set verdict to "has_parent" without an evidenceUrl you opened and a verbatim snippet from it that names both companies and the ownership. "unknown" ALWAYS beats a plausible guess.
+**NEVER** put a financial sponsor in immediateParent or ultimateParent.
+**NEVER** return a registry-only or offshore shell with no website and no operations. Skip it and climb to the next owner with a website.
+**NEVER** return $name itself, or any company on the domain $domain, as its own parent.
+**NEVER** write "N/A", "Not found", "Unknown" or null in a name, domain, URL or country field. Missing values are "".
+**ALWAYS** set verdict to "top_level" only when a page you opened shows no operating company owns the company (for example a public listing with no controlling corporate owner, "privately held", "family-owned", "employee-owned", or ownership only by a sponsor). When you simply found no owner, verdict is "unknown".
+**ALWAYS** give domains as a bare root host (example.com), LinkedIn pages as https://www.linkedin.com/company/<slug>, countries as 2-letter ISO codes, and dates as YYYY-MM-DD or "".
+**ALWAYS** keep research short: at most six searches and six pages.
+**CRITICAL:** Return ONE JSON object only. No markdown, no code fence, no preamble.
+
+#Return Format#
+{"verdict": "has_parent", "immediateParent": {"name": "...", "domain": "...", "linkedinUrl": "...", "hqCountryCode": "US"}, "ultimateParent": {"name": "...", "domain": "...", "linkedinUrl": "...", "hqCountryCode": "US"}, "financialSponsor": {"name": "", "domain": "", "linkedinUrl": ""}, "relationshipType": "Owned subsidiary", "entityRepresentation": "Operating company", "operationalStatus": "Active", "clayChainVerdict": "agrees", "confidence": "high", "asOfDate": "2025-12-31", "evidenceUrl": "https://...", "snippet": "verbatim, max 25 words", "reasoning": "one or two sentences", "executionLogs": ["..."]}
+verdict: "has_parent", "top_level" or "unknown". immediateParent and ultimateParent hold "" in every field unless verdict is "has_parent". relationshipType: "Owned subsidiary", "Branch/division", "Acquired/absorbed", "Joint venture", "Franchise", "Other affiliation" (network or federation member), "Standalone" (top_level) or "Unknown". entityRepresentation: "Operating company", "Holding company", "Brand", "Product line", "Location/facility", "Internal division", "Software/platform", "Government entity", "Education entity", "Other" or "Unknown". operationalStatus: "Active", "Absorbed", "Out of business" or "Undetermined". clayChainVerdict: "agrees", "corrected" or "no_clay_data". confidence: high when the owner's or the company's own page or a filing states the ownership; medium when only news or a registry does; low otherwise. evidenceUrl and snippet are "" when verdict is "unknown".
+
+#Examples#
+### Example 1 - a sponsor owns the operating parent
+Input: $name = Example Brake Systems, $domain = examplebrakes.com, $clayChain = "1: Example Capital Partners (examplecapital.com)"
+Web findings: the About page says "Example Brake Systems is a division of Example Motion Inc."; Example Motion's site says it "is owned by funds managed by Example Capital Partners", a private equity firm.
+Output: {"verdict": "has_parent", "immediateParent": {"name": "Example Motion Inc.", "domain": "examplemotion.com", "linkedinUrl": "https://www.linkedin.com/company/example-motion", "hqCountryCode": "US"}, "ultimateParent": {"name": "Example Motion Inc.", "domain": "examplemotion.com", "linkedinUrl": "https://www.linkedin.com/company/example-motion", "hqCountryCode": "US"}, "financialSponsor": {"name": "Example Capital Partners", "domain": "examplecapital.com", "linkedinUrl": "https://www.linkedin.com/company/example-capital-partners"}, "relationshipType": "Branch/division", "entityRepresentation": "Internal division", "operationalStatus": "Active", "clayChainVerdict": "corrected", "confidence": "high", "asOfDate": "2025-06-30", "evidenceUrl": "https://examplebrakes.com/about", "snippet": "Example Brake Systems is a division of Example Motion Inc.", "reasoning": "The company's site names Example Motion as owner; Clay listed Example Motion's private equity owner, which is a sponsor, not a parent.", "executionLogs": ["site check: Example Brake Systems, Detroit (https://examplebrakes.com/about)", "owner check: Example Motion, owned by Example Capital funds (https://examplemotion.com/company)"]}
+
+### Example 2 - acquired and absorbed, Clay's owner is out of date
+Input: $name = Example Payroll Ltd, $domain = examplepayroll.co.uk, $clayChain = "1: Old Owner Group (oldownergroup.com)"
+Web findings: a 2024 press release from Globex plc says it "completed the acquisition of Example Payroll and has fully integrated it into Globex Workforce"; Globex plc is a listed company with no corporate owner.
+Output: {"verdict": "has_parent", "immediateParent": {"name": "Globex plc", "domain": "globex.com", "linkedinUrl": "https://www.linkedin.com/company/globex", "hqCountryCode": "GB"}, "ultimateParent": {"name": "Globex plc", "domain": "globex.com", "linkedinUrl": "https://www.linkedin.com/company/globex", "hqCountryCode": "GB"}, "financialSponsor": {"name": "", "domain": "", "linkedinUrl": ""}, "relationshipType": "Acquired/absorbed", "entityRepresentation": "Operating company", "operationalStatus": "Absorbed", "clayChainVerdict": "corrected", "confidence": "high", "asOfDate": "2024-03-12", "evidenceUrl": "https://globex.com/news/example-payroll-acquisition", "snippet": "completed the acquisition of Example Payroll and has fully integrated it into Globex Workforce", "reasoning": "Globex acquired and absorbed the company in 2024, replacing the older owner Clay lists.", "executionLogs": ["site check: Example Payroll redirects to Globex Workforce (https://examplepayroll.co.uk)", "owner search: 2024 acquisition release (https://globex.com/news/example-payroll-acquisition)"]}
+
+### Example 3 - no owner found
+Input: $name = Example Freight Co, $domain = examplefreight.com, $clayChain = ""
+Web findings: the site and searches name no owner and no listing.
+Output: {"verdict": "unknown", "immediateParent": {"name": "", "domain": "", "linkedinUrl": "", "hqCountryCode": ""}, "ultimateParent": {"name": "", "domain": "", "linkedinUrl": "", "hqCountryCode": ""}, "financialSponsor": {"name": "", "domain": "", "linkedinUrl": ""}, "relationshipType": "Unknown", "entityRepresentation": "Operating company", "operationalStatus": "Active", "clayChainVerdict": "no_clay_data", "confidence": "low", "asOfDate": "", "evidenceUrl": "", "snippet": "", "reasoning": "No corporate owner or listing found on the company's site or in searches.", "executionLogs": ["site check: Example Freight Co, Houston (https://examplefreight.com)", "owner search: no owner found"]}
+
+Begin Step 1 now. Return ONLY the JSON object.</script>
+<script>
+const E = a => a.map(x => `<span class="e">${x}</span>`).join("");
+const STEPS = [
+  { k: "resolve", kind: "Clay + AI check", cls: "k-clay", map: "Map step 1", t: "Resolve the company", s: "Find the right Clay company for the account.",
+    meta: "Runs on every account",
+    reads: ["Account name", "CRM website", "LinkedIn page", "City", "Industry"],
+    does: ["Clay matches the website and LinkedIn page to a company.", "Free checks confirm the name, country and website agree.", "Clues disagree? An AI match check picks the right candidate, with a second opinion.", "Last resort: a web-research Claygent finds the account's own company."],
+    returns: [["Final Clay ID", ["Clay ID", "blank"]], ["Clay ID Status", ["Matched", "Successor", "Needs review"]], ["Clay ID Reason", ["plain sentences"]]],
+    foot: "Every later step keys on this ID." },
+  { k: "chain", kind: "Clay data", cls: "k-clay", map: "Map step 2", t: "Clay's parent chain", s: "Clay's hierarchy, plus leads when it's empty.",
+    meta: "Runs when the account has a Clay ID · 2 Clay credits",
+    reads: ["Final Clay ID", "HQ country"],
+    does: ["Enrich account hierarchies returns each parent and its distance from the company.", "No parent from Clay? HG Insights adds its corporate tree.", "HQ in Europe too? HitHorizons adds registry records."],
+    returns: [["Clay Parent Chain", ["1: Apollo Global Management (apollo.com)"]], ["HG Insights Leads", ["text", "blank"]], ["HitHorizons Leads", ["text", "blank"]]],
+    foot: "These are leads for the research, never answers. Clay's chain sometimes names the investor or a past owner." },
+  { k: "research", kind: "Claygent", cls: "k-ai", map: "Map steps 4 + 5", t: "Hierarchy Research", s: "Checks the chain on the web. Finds today's owner.",
+    meta: "GPT 6 Luna on your OpenAI key · web research · at most 6 searches and 6 pages",
+    reads: ["Account name", "Domain", "LinkedIn page", "HQ city + country", "Clay Parent Chain", "HG Insights Leads", "HitHorizons Leads"],
+    ordered: ["Confirm the company on its own site.", "List every owner the leads name.", "Find today's owner: its own pages, the 10-K and Exhibit 21, registries, then news.", "The most recent dated source wins.", "Climb to the top operating company: the ultimate parent.", "Set PE, VC, family offices and sovereign funds aside as the sponsor."],
+    cases: ["Holding companies are parents", "Absorbed → the acquirer", "Divisions → their company", "Joint venture → larger owner", "Networks are parents", "Franchisors are not"],
+    guard: ["Every parent needs a page opened in this run and a quote naming both companies.", "Unknown beats a guess.", "Never a shell company, never the company itself."],
+    schema: [["verdict", ["has_parent", "top_level", "unknown"]], ["immediateParent", ["name", "domain", "linkedinUrl", "hqCountryCode"]], ["ultimateParent", ["name", "domain", "linkedinUrl", "hqCountryCode"]], ["financialSponsor", ["name", "domain", "linkedinUrl"]],
+      ["relationshipType", ["Owned subsidiary", "Branch/division", "Acquired/absorbed", "Joint venture", "Franchise", "Other affiliation", "Standalone", "Unknown"]],
+      ["entityRepresentation", ["Operating company", "Holding company", "Brand", "Product line", "Location/facility", "Internal division", "Software/platform", "Government entity", "Education entity", "Other", "Unknown"]],
+      ["operationalStatus", ["Active", "Absorbed", "Out of business", "Undetermined"]], ["clayChainVerdict", ["agrees", "corrected", "no_clay_data"]], ["confidence", ["high", "medium", "low"]], ["evidence", ["asOfDate", "evidenceUrl", "snippet", "reasoning"]]], prompt: true },
+  { k: "match", kind: "Formula + lookup", cls: "k-sf", map: "Map step 3", t: "Pick the source, match to Salesforce", s: "Decide whose answer to trust, then find the Navan account.",
+    meta: "Runs after the research · no credits",
+    rules: [["Research is confident and names a parent", "AI research"], ["No operating owner, but a sponsor owns it: the sponsor is the parent", "AI research (sponsor)"], ["No owner at all", "AI research (top-level)"], ["Research unsure: keep Clay's chain, flag it", "Clay hierarchy (unverified)"]],
+    rules2: [["Exactly one Navan account matches (LinkedIn page, then website)", "Parent matched"], ["Several match", "Parent has duplicate accounts"], ["None match", "Parent not in Salesforce"]],
+    foot: "Confident means high or medium. The account itself is never its own parent. Duplicate account IDs are listed in Parent Reason." },
+  { k: "write", kind: "Write-back", cls: "k-sf", map: "To Audiences", t: "Write to Audiences", s: "Every field comes with its reason.",
+    meta: "Runs on every account · fields carry the “Clay - ” prefix",
+    returns: [["Parent Account", ["name", "Salesforce ID"]], ["Ultimate Parent Account", ["name", "Salesforce ID"]], ["Parent Status + Parent Reason", ["status", "plain sentences"]], ["Hierarchy Source", ["where the answer came from"]], ["Investor/Owner", ["the sponsor"]], ["Relationship Type · Entity Type · Operating Status", ["from the research"]], ["Record Validated + Validation Reason", ["Yes", "No"]], ["Last Enriched", ["date"]]],
+    rules: [["Matched, with employee count, industry grouping and HQ country", "Record Validated: Yes"], ["Anything missing", "Record Validated: No"]],
+    foot: "Review flags such as Parent unverified are listed in Validation Reason. They advise; they don't block." },
+];
+
+const stepsEl = document.getElementById("steps"), panel = document.getElementById("panel");
+stepsEl.innerHTML = STEPS.map(s => `<button class="step ${s.cls}" role="tab" id="tab-${s.k}" data-k="${s.k}" aria-selected="false" aria-controls="panel">
+  <span class="map">${s.map}</span><span class="kind">${s.kind}</span><span class="t">${s.t}</span><span class="s">${s.s}</span></button>`).join("");
+
+function rows(list) { return `<div class="schema">${list.map(([f, v]) => `<div class="row"><span class="f">${f}</span><span class="v">${E(v)}</span></div>`).join("")}</div>`; }
+function rules(list) { return `<div class="rules">${list.map(([a, b]) => `<div class="rule"><span>${a}</span><span class="to">${b}</span></div>`).join("")}</div>`; }
+
+function show(k) {
+  const s = STEPS.find(x => x.k === k);
+  document.querySelectorAll(".step").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k));
+  panel.className = "panel " + s.cls;
+  panel.setAttribute("aria-labelledby", "tab-" + k);
+  let left = "", right = "";
+  if (s.reads) left += `<div class="blk"><span class="lbl">Reads</span><div class="chips">${s.reads.map(r => `<span class="in">${r}</span>`).join("")}</div></div>`;
+  if (s.does) left += `<div class="blk"><span class="lbl">Does</span><ul class="does">${s.does.map(d => `<li>${d}</li>`).join("")}</ul></div>`;
+  if (s.ordered) left += `<div class="blk"><span class="lbl">Instructions, in order</span><ol class="does">${s.ordered.map(d => `<li>${d}</li>`).join("")}</ol></div>`;
+  if (s.cases) left += `<div class="blk"><span class="lbl">Special cases</span><div class="chips">${s.cases.map(c => `<span class="in">${c}</span>`).join("")}</div></div>`;
+  if (s.guard) left += `<div class="guard"><span class="lbl">Guardrails</span>${s.guard.map(g => `<span>${g}</span>`).join("")}</div>`;
+  if (s.k === "match") { left += `<div class="blk"><span class="lbl">Whose answer → Hierarchy Source</span>${rules(s.rules)}</div>`; right += `<div class="blk"><span class="lbl">Salesforce match → Parent Status</span>${rules(s.rules2)}</div>`; }
+  if (s.schema) right += `<div class="blk"><span class="lbl">Returns (JSON)</span>${rows(s.schema)}</div>`;
+  if (s.returns) right += `<div class="blk"><span class="lbl">${s.k === "write" ? "Writes" : "Returns"}</span>${rows(s.returns)}</div>`;
+  if (s.k === "write") left = `<div class="blk"><span class="lbl">Record Validated: can I use this record for territory planning and the GBV model?</span>${rules(s.rules)}</div>` + left;
+  panel.innerHTML = `<div class="ph"><span class="kind">${s.kind}</span><h3>${s.t}</h3><span class="meta">${s.meta}</span></div>
+    <div class="grid2"><div class="blk" style="gap:18px">${left}</div><div class="blk" style="gap:18px">${right}</div></div>
+    ${s.foot ? `<p class="foot">${s.foot}</p>` : ""}
+    ${s.prompt ? `<details class="full"><summary>Full prompt</summary><pre></pre></details>` : ""}`;
+  if (s.prompt) panel.querySelector(".full pre").textContent = document.getElementById("prompt-text").textContent;
+}
+stepsEl.addEventListener("click", e => { const b = e.target.closest(".step"); if (b) show(b.dataset.k); });
+stepsEl.addEventListener("keydown", e => {
+  if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) return;
+  const tabs = [...document.querySelectorAll(".step")], i = tabs.indexOf(document.activeElement);
+  if (i < 0) return; e.preventDefault();
+  const n = tabs[(i + (e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : tabs.length - 1)) % tabs.length];
+  n.focus(); show(n.dataset.k);
+});
+document.querySelectorAll(".cell").forEach(c => c.addEventListener("click", () => { show(c.dataset.k); panel.scrollIntoView({ behavior: "smooth", block: "nearest" }); }));
+show("research");
+</script>
+
+</html>
